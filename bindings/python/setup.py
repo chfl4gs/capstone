@@ -63,7 +63,7 @@ if SYSTEM == 'darwin':
 elif SYSTEM in ('win32', 'cygwin'):
     VERSIONED_LIBRARY_FILE = "capstone.dll"
     LIBRARY_FILE = "capstone.dll"
-    STATIC_LIBRARY_FILE = None
+    STATIC_LIBRARY_FILE = "capstone.lib"
 else:
     VERSIONED_LIBRARY_FILE = "libcapstone.so.{PKG_MAJOR}".format(**VERSION_DATA)
     LIBRARY_FILE = "libcapstone.so"
@@ -225,7 +225,7 @@ setup(
     ],
     requires=['ctypes'],
     cmdclass=cmdclass,
-    zip_safe=True,
+    zip_safe=False,
     include_package_data=True,
     package_data={
         "capstone": ["lib/*", "include/capstone/*"],

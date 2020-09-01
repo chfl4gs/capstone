@@ -310,8 +310,7 @@ CFLAGS += $(foreach arch,$(LIBARCHS),-arch $(arch))
 LDFLAGS += $(foreach arch,$(LIBARCHS),-arch $(arch))
 $(LIBNAME)_LDFLAGS += -shared
 # Cygwin?
-IS_CYGWIN := $(shell $(CC) -dumpmachine 2>/dev/null | grep -i cygwin | wc -l)
-ifeq ($(IS_CYGWIN),1)
+ifneq ($(filter CYGWIN%,$(UNAME_S)),)
 EXT = dll
 AR_EXT = lib
 # Cygwin doesn't like -fPIC
@@ -319,8 +318,7 @@ CFLAGS := $(CFLAGS:-fPIC=)
 # On Windows we need the shared library to be executable
 else
 # mingw?
-IS_MINGW := $(shell $(CC) --version 2>/dev/null | grep -i "\(mingw\|MSYS\)" | wc -l)
-ifeq ($(IS_MINGW),1)
+ifneq ($(filter MINGW%,$(UNAME_S)),)
 EXT = dll
 AR_EXT = lib
 # mingw doesn't like -fPIC either
@@ -337,10 +335,10 @@ endif
 endif
 
 ifeq ($(CAPSTONE_SHARED),yes)
-ifeq ($(IS_MINGW),1)
-LIBRARY = $(BLDIR)/$(LIBNAME).$(VERSION_EXT)
-else ifeq ($(IS_CYGWIN),1)
-LIBRARY = $(BLDIR)/$(LIBNAME).$(VERSION_EXT)
+ifneq ($(filter MINGW%,$(UNAME_S)),)
+LIBRARY = $(BLDIR)/$(LIBNAME).$(EXT)
+else ifneq ($(filter CYGWIN%,$(UNAME_S)),)
+LIBRARY = $(BLDIR)/$(LIBNAME).$(EXT)
 else	# *nix
 LIBRARY = $(BLDIR)/lib$(LIBNAME).$(VERSION_EXT)
 CFLAGS += -fvisibility=hidden
@@ -348,9 +346,9 @@ endif
 endif
 
 ifeq ($(CAPSTONE_STATIC),yes)
-ifeq ($(IS_MINGW),1)
+ifneq ($(filter MINGW%,$(UNAME_S)),)
 ARCHIVE = $(BLDIR)/$(LIBNAME).$(AR_EXT)
-else ifeq ($(IS_CYGWIN),1)
+else ifneq ($(filter CYGWIN%,$(UNAME_S)),)
 ARCHIVE = $(BLDIR)/$(LIBNAME).$(AR_EXT)
 else
 ARCHIVE = $(BLDIR)/lib$(LIBNAME).$(AR_EXT)
